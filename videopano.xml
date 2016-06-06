@@ -1,0 +1,57 @@
+﻿<krpano>
+
+	<action name="startup" autorun="onstart">
+			jsget(error,errorMsg());
+		if(device.panovideosupport == false,
+			error(get(error));
+		  ,
+			loadscene(videopano);
+		  );
+	</action>
+
+	<scene name="videopano" title=""   onstart="snowballs()">
+	
+		<!-- include the videoplayer interface / skin (with VR support) -->
+		<include url="skin/videointerface.xml" />
+
+		<!-- include the videoplayer plugin -->
+		<plugin name="video"
+		        url.html5="%SWFPATH%/plugins/videoplayer.js"
+		        url.flash="%SWFPATH%/plugins/videoplayer.swf"
+		        pausedonstart="true"
+		        loop="true"
+		        volume="1.0"
+		        onloaded="add_video_sources();"
+		        />
+
+		<!-- use the videoplayer plugin as panoramic image source -->
+		<image>
+			<sphere url="plugin:video" />
+		</image>
+
+		<!-- set the default view -->
+		<view hlookat="0" vlookat="0" fovtype="DFOV" fov="130" fovmin="75" fovmax="150" distortion="0.0" />
+
+		<!-- add the video sources and play the video -->
+		<action name="add_video_sources">
+			js(test());
+			jsget(myUrl1,test1());
+			jsget(myUrl2,test2());
+			jsget(postImgUrl,setImg());
+
+			videointerface_addsource('1024x512', get(myUrl1), get(postImgUrl));
+			videointerface_addsource('1920x960', get(myUrl2), get(postImgUrl));
+			
+			if(device.ios,
+				<!-- iOS Safari has a very slow 'video-to-webgl-texture' transfer, therefore use a low-res video by default -->
+				videointerface_play('1024x512');
+			  ,
+				videointerface_play('1920x960');
+			  );
+		</action>
+
+		<include url="snow.xml"/>
+
+	</scene>
+
+</krpano>
